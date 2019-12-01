@@ -7,6 +7,10 @@ verify_ssl = true
 
 [packages]
 beautifulsoup4 = "==4.8.1"
+mypy = "==0.750"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+typecheck = "mypy bechtrek.py --disallow-untyped-defs"
