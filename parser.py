@@ -1,10 +1,39 @@
-# import re
+from dataclasses import dataclass
 from parsec import *
+
+from typing import Optional
 
 
 whitespace = regex(r'\s*', re.MULTILINE)
 
 lexeme = lambda x: string(x) << whitespace
+
+
+class ParseObject:
+    pass
+
+
+@dataclass
+class StageDirection(ParseObject):
+    direction: str
+
+
+@dataclass
+class Scene(ParseObject):
+    description: str
+
+
+@dataclass
+class Role(ParseObject):
+    name: str
+    note: Optional[str]
+
+
+@dataclass
+class Line(ParseObject):
+    role: Role
+    dialog: str
+
 
 @generate
 def stagedir():
@@ -12,7 +41,7 @@ def stagedir():
     text = yield many(none_of(')'))
     yield lexeme(')')
 
-    return f'stagedir: {"".join(text)}'
+    return StageDirection(direction=''.join(text))
 
 
 @generate
@@ -21,7 +50,7 @@ def scene():
     text = yield many(none_of(']'))
     yield lexeme(']')
 
-    return f'scene: {"".join(text)}'
+    return Scene(description=''.join(text))
 
 
 def note():
@@ -49,7 +78,7 @@ def raw_role():
 
     name = ''.join(raw_name).strip()
 
-    return f'role({name}, {role_note})'
+    return Role(name=name, note=role_note)
 
 
 @generate
@@ -66,7 +95,8 @@ def log():
         return any(phrase in t.lower() for phrase in phrases)
 
     if is_log(text):
-        return f'log: {text}'
+        return Line(role=Role(name='UNKNOWN', note=None),
+                    dialog=text)
 
 
 @generate
@@ -75,7 +105,7 @@ def line():
     yield lexeme(':')
     line = yield many(none_of(''))
 
-    return f'line: {role}, {"".join(line)}'
+    return Line(role=role, dialog=''.join(line))
 
 
 raw_line = stagedir ^ scene ^ line ^ log
