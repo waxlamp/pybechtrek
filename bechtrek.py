@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
+import parsec
 from pprint import pprint
 import sys
+
+import parser
 
 from typing import Sequence, Optional
 
@@ -35,10 +38,13 @@ def main() -> int:
     doc = BeautifulSoup(htmlscript, features='html.parser')
 
     title = get_title(doc)
-    dialog = get_dialog(doc)
+    print(title)
 
-    print(get_title(doc))
-    pprint(dialog)
+    dialog = get_dialog(doc)
+    for line in dialog:
+        result = parser.raw_line.parse(line)
+
+        print(result)
 
     return 0
 
