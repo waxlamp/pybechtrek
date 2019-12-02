@@ -123,7 +123,9 @@ def main() -> int:
     # Execute any "join" commands inserted into the script process.
     modified = stitch(modified)
 
-    pprint(modified)
+    # Dump to stdout.
+    for line in modified:
+        print(line)
 
     return 0
 
