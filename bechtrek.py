@@ -10,6 +10,10 @@ import parser
 from typing import Sequence, Optional
 
 
+def get_editor():
+    return os.environ.get('EDITOR', 'vi')
+
+
 def get_title(doc: BeautifulSoup) -> Optional[str]:
     title_parts = doc.title.string.split('-')
 
@@ -45,7 +49,7 @@ def edit(line):
         print('Write just the word \'exit\' to abandon processing this script.', file=tmp)
         tmp.flush()
 
-        os.system(f'vim {name}')
+        os.system(f'{get_editor()} {name}')
 
         with open(name) as f:
             modified = f.readline()
