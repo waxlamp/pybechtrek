@@ -1,32 +1,66 @@
-# import re
+from dataclasses import dataclass
 from parsec import *
+import re
 
+from typing import Any, Generator, Optional, TypeVar, Generic
+
+
+T = TypeVar('T')
+ParserCombinator = Generator[Parser, Any, T]
 
 whitespace = regex(r'\s*', re.MULTILINE)
 
-lexeme = lambda x: string(x) << whitespace
+def lexeme(s: str) -> Parser:
+    return string(s) << whitespace
+
+
+class ParseObject:
+    pass
+
+
+@dataclass
+class StageDirection(ParseObject):
+    direction: str
+
+
+@dataclass
+class Scene(ParseObject):
+    description: str
+
+
+@dataclass
+class Role(ParseObject):
+    name: str
+    note: Optional[str]
+
+
+@dataclass
+class Line(ParseObject):
+    role: Role
+    dialog: str
+
 
 @generate
-def stagedir():
+def stagedir() -> ParserCombinator[StageDirection]:
     yield lexeme('(')
     text = yield many(none_of(')'))
     yield lexeme(')')
 
-    return f'stagedir: {"".join(text)}'
+    return StageDirection(direction=''.join(text))
 
 
 @generate
-def scene():
+def scene() -> ParserCombinator[Scene]:
     yield lexeme('[')
     text = yield many(none_of(']'))
     yield lexeme(']')
 
-    return f'scene: {"".join(text)}'
+    return Scene(description=''.join(text))
 
 
-def note():
+def note() -> Parser:
     @generate
-    def try_note():
+    def try_note() -> ParserCombinator[str]:
         yield lexeme('[')
         note = yield many(none_of(']'))
         yield lexeme(']')
@@ -34,7 +68,7 @@ def note():
         return ''.join(note)
 
     @generate
-    def failed():
+    def failed() -> ParserCombinator[None]:
         yield lexeme('')
 
         return None
@@ -43,21 +77,21 @@ def note():
 
 
 @generate
-def raw_role():
+def raw_role() -> ParserCombinator[Role]:
     raw_name = yield many(none_of(':['))
     role_note = yield note()
 
     name = ''.join(raw_name).strip()
 
-    return f'role({name}, {role_note})'
+    return Role(name=name, note=role_note)
 
 
 @generate
-def log():
+def log() -> ParserCombinator[Optional[Line]]:
     raw_text = yield many(none_of(''))
     text = ''.join(raw_text).strip()
 
-    def is_log(t):
+    def is_log(t: str) -> bool:
         phrases = [
             'star date',
             'stardate',
@@ -66,16 +100,19 @@ def log():
         return any(phrase in t.lower() for phrase in phrases)
 
     if is_log(text):
-        return f'log: {text}'
+        return Line(role=Role(name='UNKNOWN', note=None),
+                    dialog=text)
+    else:
+        return None
 
 
 @generate
-def line():
+def line() -> ParserCombinator[Line]:
     role = yield raw_role
     yield lexeme(':')
     line = yield many(none_of(''))
 
-    return f'line: {role}, {"".join(line)}'
+    return Line(role=role, dialog=''.join(line))
 
 
 raw_line = stagedir ^ scene ^ line ^ log
