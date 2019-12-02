@@ -7,10 +7,10 @@ import tempfile
 
 import parser
 
-from typing import Sequence, Optional
+from typing import Sequence, Optional, List
 
 
-def get_editor():
+def get_editor() -> str:
     return os.environ.get('EDITOR', 'vi')
 
 
@@ -36,7 +36,7 @@ class StopProcessing(BaseException):
     pass
 
 
-def edit(line):
+def edit(line: str) -> str:
     with tempfile.NamedTemporaryFile(mode='w+') as tmpfile:
         tmp = tmpfile.file
         name = tmpfile.name
@@ -76,8 +76,8 @@ def parse_with_correction(line: str) -> str:
         return parse_with_correction(modified)
 
 
-def stitch(lines: Sequence[str]) -> Sequence[str]:
-    out = []
+def stitch(lines: Sequence[str]) -> List[str]:
+    out: List[str] = []
     for line in lines:
         if line.startswith('join:'):
             line = line.split('join:')[1]
