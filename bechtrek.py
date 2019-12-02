@@ -72,21 +72,40 @@ def parse_with_correction(line: str) -> str:
         return parse_with_correction(modified)
 
 
+def stitch(lines: Sequence[str]) -> Sequence[str]:
+    out = []
+    for line in lines:
+        if line.startswith('join:'):
+            line = line.split('join:')[1]
+            out[-1] += line
+        else:
+            out.append(line)
+
+    return out
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print('usage: bechtrek.py <scriptfilehtml>', file=sys.stderr)
         return 1
 
+    # Open the script file.
     htmlscriptfile = sys.argv[1]
     with open(htmlscriptfile, encoding='ISO-8859-1') as f:
         htmlscript = f.read()
 
+    # Parse it.
     doc = BeautifulSoup(htmlscript, features='html.parser')
 
+    # Grab the episode title.
     title = get_title(doc)
     print(title)
 
+    # Grab the dialog lines.
     dialog = get_dialog(doc)
+
+    # Attempt to parse each line; open an editor and let the user fix any
+    # problems that are found.
     modified = []
     for line in dialog:
         try:
@@ -96,6 +115,9 @@ def main() -> int:
             return 1
 
         modified.append(result)
+
+    # Execute any "join" commands inserted into the script process.
+    modified = stitch(modified)
 
     pprint(modified)
 
