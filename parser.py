@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 from parsec import *
 import re
 
@@ -14,26 +15,29 @@ def lexeme(s: str) -> Parser:
     return string(s) << whitespace
 
 
-class ParseObject:
+class ParseObject(object):
     pass
 
-
+@dataclass_json
 @dataclass
 class StageDirection(ParseObject):
     direction: str
 
 
+@dataclass_json
 @dataclass
 class Scene(ParseObject):
     description: str
 
 
+@dataclass_json
 @dataclass
 class Role(ParseObject):
     name: str
     note: Optional[str]
 
 
+@dataclass_json
 @dataclass
 class Line(ParseObject):
     role: Role

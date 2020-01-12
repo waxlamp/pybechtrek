@@ -123,9 +123,12 @@ def main() -> int:
     # Execute any "join" commands inserted into the script process.
     modified = stitch(modified)
 
+    # Re-parse the corrected lines.
+    parse = [parser.raw_line.parse(line) for line in modified]
+
     # Dump to stdout.
-    for line in modified:
-        print(line)
+    for line, p in zip(modified, parse):
+        print(p.to_json())
 
     return 0
 

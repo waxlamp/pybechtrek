@@ -9,6 +9,7 @@ verify_ssl = true
 beautifulsoup4 = "==4.8.1"
 mypy = "==0.750"
 parsec = "==3.5"
+dataclasses-json = "==0.3.7"
 
 [requires]
 python_version = "3.8"
