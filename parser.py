@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
+import json
 from parsec import *
 import re
 
@@ -16,7 +17,23 @@ def lexeme(s: str) -> Parser:
 
 
 class ParseObject(object):
-    pass
+    def encode(self):
+        x = self.to_dict()
+        x['type'] = type(self).__name__
+
+        return json.dumps(x)
+
+    @staticmethod
+    def decode(text):
+        x = json.loads(text)
+        type = x['type']
+        del x['type']
+
+        if type in ['StageDirection', 'Scene', 'Role', 'Line']:
+            constructor = eval(type)
+            return constructor.from_dict(x)
+        else:
+            raise TypeError(f'illegal type tag "{type}"')
 
 @dataclass_json
 @dataclass

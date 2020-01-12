@@ -127,8 +127,8 @@ def main() -> int:
     parse = [parser.raw_line.parse(line) for line in modified]
 
     # Dump to stdout.
-    for line, p in zip(modified, parse):
-        print(p.to_json())
+    for p in parse:
+        print(p.encode())
 
     return 0
 
