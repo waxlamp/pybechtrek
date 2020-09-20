@@ -7,7 +7,7 @@ import tempfile
 
 import parser
 
-from typing import Sequence, Optional, List
+from typing import Sequence, Optional, List, cast
 
 
 def get_editor() -> str:
@@ -123,9 +123,12 @@ def main() -> int:
     # Execute any "join" commands inserted into the script process.
     modified = stitch(modified)
 
+    # Re-parse the corrected lines.
+    parse = cast(List[parser.ParseObject], [parser.raw_line.parse(line) for line in modified])
+
     # Dump to stdout.
-    for line in modified:
-        print(line)
+    for p in parse:
+        print(p.encode())
 
     return 0
 
