@@ -37,26 +37,22 @@ class ParseObject(DataClassJsonMixin):
         else:
             raise TypeError(f'illegal type tag "{type}"')
 
-@dataclass_json
 @dataclass
 class StageDirection(ParseObject):
     direction: str
 
 
-@dataclass_json
 @dataclass
 class Scene(ParseObject):
     description: str
 
 
-@dataclass_json
 @dataclass
 class Role(ParseObject):
     name: str
     note: Optional[str]
 
 
-@dataclass_json
 @dataclass
 class Line(ParseObject):
     role: Role
