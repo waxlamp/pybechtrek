@@ -1,5 +1,6 @@
+from __future__ import annotations
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 import json
 from parsec import *
 import re
@@ -16,15 +17,16 @@ def lexeme(s: str) -> Parser:
     return string(s) << whitespace
 
 
-class ParseObject(object):
-    def encode(self):
+@dataclass
+class ParseObject(DataClassJsonMixin):
+    def encode(self) -> str:
         x = self.to_dict()
         x['type'] = type(self).__name__
 
         return json.dumps(x)
 
     @staticmethod
-    def decode(text):
+    def decode(text: str) -> ParseObject:
         x = json.loads(text)
         type = x['type']
         del x['type']

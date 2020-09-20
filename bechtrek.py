@@ -7,7 +7,7 @@ import tempfile
 
 import parser
 
-from typing import Sequence, Optional, List
+from typing import Sequence, Optional, List, cast
 
 
 def get_editor() -> str:
@@ -124,7 +124,7 @@ def main() -> int:
     modified = stitch(modified)
 
     # Re-parse the corrected lines.
-    parse = [parser.raw_line.parse(line) for line in modified]
+    parse = cast(List[parser.ParseObject], [parser.raw_line.parse(line) for line in modified])
 
     # Dump to stdout.
     for p in parse:
