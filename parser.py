@@ -5,7 +5,7 @@ import json
 from parsec import *
 import re
 
-from typing import Any, Generator, Optional, TypeVar, Generic
+from typing import Any, Generator, Optional, TypeVar, Generic, Literal
 
 
 T = TypeVar('T')
@@ -50,6 +50,7 @@ class Scene(ParseObject):
 @dataclass
 class Role(ParseObject):
     name: str
+    gender: Optional[Literal["m", "f", "u", "o"]]
     note: Optional[str]
 
 
@@ -102,7 +103,7 @@ def raw_role() -> ParserCombinator[Role]:
 
     name = ''.join(raw_name).strip()
 
-    return Role(name=name, note=role_note)
+    return Role(name=name, note=role_note, gender=None)
 
 
 @generate
@@ -119,7 +120,7 @@ def log() -> ParserCombinator[Optional[Line]]:
         return any(phrase in t.lower() for phrase in phrases)
 
     if is_log(text):
-        return Line(role=Role(name='UNKNOWN', note=None),
+        return Line(role=Role(name='UNKNOWN', note=None, gender=None),
                     dialog=text)
     else:
         return None
