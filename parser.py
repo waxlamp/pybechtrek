@@ -50,7 +50,7 @@ class Scene(ParseObject):
 @dataclass
 class Role(ParseObject):
     name: str
-    gender: Optional[Literal["m", "f", "u", "o"]]
+    gender: Optional[Literal["m", "f", "o"]]
     note: Optional[str]
 
 
