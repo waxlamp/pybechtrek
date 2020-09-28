@@ -37,10 +37,19 @@ def main() -> int:
                     line.role.name = name.upper()
 
                 gender = genderdb.get(line.role.name)
-                while gender not in ["m", "f", "u", "o"]:
-                    response = input(f"What is {line.role.name}'s gender? ")
-                    gender = response[0] if len(response) > 0 else None
-                genderdb[line.role.name] = gender
+                if gender is None:
+                    while gender not in ["m", "f", "u", "o"]:
+                        response = input(f"What is {line.role.name}'s gender? ")
+                        gender = response[0] if len(response) > 0 else None
+
+                    save = None
+                    while save not in ["y", "n"]:
+                        response = input("Save in gender DB? ")
+                        save = response[0] if len(response) > 0 else None
+
+                    if save:
+                        genderdb[line.role.name] = gender
+
                 line.role.gender = gender
 
                 print(line.encode(), file=o)
